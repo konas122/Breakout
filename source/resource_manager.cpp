@@ -77,6 +77,7 @@ Shader ResourceManager::loadShaderFromFile(const char *vShaderFile, const char *
     catch (std::exception e) {
         std::cout << "ERROR::SHADER: Failed to read shader files" << std::endl;
     }
+
     const char *vShaderCode = vertexCode.c_str();
     const char *fShaderCode = fragmentCode.c_str();
     const char *gShaderCode = geometryCode.c_str();
@@ -90,8 +91,7 @@ Shader ResourceManager::loadShaderFromFile(const char *vShaderFile, const char *
 Texture2D ResourceManager::loadTextureFromFile(const char *file, bool alpha) {
     // create texture object
     Texture2D texture;
-    if (alpha)
-    {
+    if (alpha) {
         texture.Internal_Format = GL_RGBA;
         texture.Image_Format = GL_RGBA;
     }

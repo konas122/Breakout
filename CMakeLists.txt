@@ -2,12 +2,15 @@ cmake_minimum_required(VERSION 3.10)
 
 project(main)
 
+file(COPY resources/ DESTINATION ${CMAKE_BINARY_DIR}/Debug)
+file(COPY source/shaders DESTINATION ${CMAKE_BINARY_DIR}/Debug)
+
 set(SOURCE_DIR "source")
 message("SOURCE_DIR: ${SOURCE_DIR}")
 include_directories(${SOURCE_DIR})
 
 file(GLOB_RECURSE SOURCE_FILES "${SOURCE_DIR}/*.cpp" "${SOURCE_DIR}/*.h")
-message("SOURCE_DIR: ${SOURCE_FILES}")
+# message("SOURCE_DIR: ${SOURCE_FILES}")
 add_executable(main ${SOURCE_FILES})
 
 
