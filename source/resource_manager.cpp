@@ -6,7 +6,6 @@
 
 #include <glad/glad.h>
 #include "stb_image.h"
-#define STB_IMAGE_IMPLEMENTATION
 
 
 // Instantiate static variables
@@ -20,7 +19,7 @@ Shader ResourceManager::LoadShader(const char *vShaderFile, const char *fShaderF
 }
 
 
-Shader ResourceManager::GetShader(std::string name) {
+Shader& ResourceManager::GetShader(std::string name) {
     return Shaders[name];
 }
 
@@ -31,7 +30,7 @@ Texture2D ResourceManager::LoadTexture(const char *file, bool alpha, std::string
 }
 
 
-Texture2D ResourceManager::GetTexture(std::string name) {
+Texture2D& ResourceManager::GetTexture(std::string name) {
     return Textures[name];
 }
 
