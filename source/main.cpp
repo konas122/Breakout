@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
     float lastFrame = 0.0f;
 
     while (!glfwWindowShouldClose(window)) {
-        float currentFrame = glfwGetTime();
+        float currentFrame = (float)glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
         glfwPollEvents();
