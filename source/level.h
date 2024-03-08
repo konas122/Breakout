@@ -13,7 +13,7 @@
 class GameLevel {
 public:
     std::vector<GameObject> Bricks;
-    GameLevel() { }
+    GameLevel() {}
 
     void Load(const char *file, unsigned int levelWidth, unsigned int levelHeight);
 
