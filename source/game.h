@@ -1,18 +1,28 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include <tuple>
 #include <vector>
 #include <GLFW/glfw3.h>
 
 #include "level.h"
 
 
-// Represents the current state of the game
 enum GameState {
     GAME_ACTIVE,
     GAME_MENU,
     GAME_WIN
 };
+
+enum Direction {
+    UP,
+    RIGHT,
+    DOWN,
+    LEFT
+};
+
+typedef std::tuple<bool, Direction, glm::vec2> Collision;
+
 
 class Game {
 public:
@@ -32,8 +42,10 @@ public:
     void ProcessInput(float dt);
     void Update(float dt);
     void Render();
-    // collision
     void DoCollisions();
+    // reset
+    void ResetLevel();
+    void ResetPlayer();
 };
 
 #endif
