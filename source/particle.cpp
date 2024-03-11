@@ -93,8 +93,7 @@ void ParticleGenerator::Draw() {
     this->shader.Use();
 
     for (Particle &particle : this->particles) {
-        if (particle.Life > 0.0f)
-        {
+        if (particle.Life > 0.0f) {
             this->shader.SetVector2f("offset", particle.Position);
             this->shader.SetVector4f("color", particle.Color);
             this->texture.Bind();

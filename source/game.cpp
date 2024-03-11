@@ -4,12 +4,17 @@
 #include "resource_manager.h"
 #include "sprite_renderer.h"
 #include "particle.h"
+#include "post_process.h"
+
+// #define CHAOS_DEBBUG
+// #define CONFUSE_DEBUG
 
 
 BallObject      *Ball;
 GameObject      *Player;
 SpriteRenderer  *Renderer;
 ParticleGenerator   *Particles;
+PostProcessor   *Effects;
 
 const float PLAYER_VELOCITY(500.0f);
 const glm::vec2 PLAYER_SIZE(100.0f, 20.0f);
@@ -18,6 +23,8 @@ const float BALL_RADIUS = 20.0f;
 const glm::vec2 INITIAL_BALL_VELOCITY(100.0f, -350.0f);
 
 float strength = 2.0f;
+float ShakeTime = 0.0f;
+
 
 Game::Game(unsigned int width, unsigned int height) 
     : State(GAME_ACTIVE), Keys(), Width(width), Height(height)
@@ -31,6 +38,7 @@ Game::~Game() {
     delete Player;
     delete Ball;
     delete Particles;
+    delete Effects;
 }
 
 
@@ -38,6 +46,7 @@ void Game::Init() {
     // load shaders
     ResourceManager::LoadShader("shaders/sprite.vs", "shaders/sprite.frag", nullptr, "sprite");
     ResourceManager::LoadShader("shaders/particle.vs", "shaders/particle.frag", nullptr, "particle");
+    ResourceManager::LoadShader("shaders/post_process.vs", "shaders/post_process.frag", nullptr, "postprocessing");
 
     // configure shaders
     glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(this->Width), 
@@ -58,7 +67,15 @@ void Game::Init() {
 
     // set render-specific controls
     Renderer = new SpriteRenderer(ResourceManager::GetShader("sprite"));
-    Particles = new ParticleGenerator(ResourceManager::GetShader("particle"), ResourceManager::GetTexture("particle"), 500);
+    Particles = new ParticleGenerator(ResourceManager::GetShader("particle"), ResourceManager::GetTexture("particle"), 1000);
+    Effects = new PostProcessor(ResourceManager::GetShader("postprocessing"), this->Width, this->Height);
+
+#ifdef CHAOS_DEBBUG
+    Effects->chaos = true;
+#endif
+#ifdef CONFUSE_DEBUG
+    Effects->confuse = true;
+#endif
 
     // load levels
     GameLevel one;      one.Load("levels/one.lvl", this->Width, this->Height / 2);
@@ -72,10 +89,7 @@ void Game::Init() {
     this->Level = 0;
 
     // configure game objects
-    glm::vec2 playerPos = glm::vec2(
-        this->Width / 2 - PLAYER_SIZE.x / 2,
-        this->Height - PLAYER_SIZE.y
-    );
+    glm::vec2 playerPos = glm::vec2(this->Width / 2 - PLAYER_SIZE.x / 2, this->Height - PLAYER_SIZE.y);
     Player = new GameObject(playerPos, PLAYER_SIZE, ResourceManager::GetTexture("paddle"));
 
     glm::vec2 ballPos = playerPos + glm::vec2(PLAYER_SIZE.x / 2.0f - BALL_RADIUS, -BALL_RADIUS * 2.0f);
@@ -87,6 +101,12 @@ void Game::Update(float dt) {
     Ball->Move(dt, this->Width);
     this->DoCollisions();
     Particles->Update(dt, *Ball, 2, glm::vec2(Ball->Radius / 2.0f));
+
+    if (ShakeTime > 0.0f) {
+        ShakeTime -= dt;
+        if (ShakeTime <= 0.0f)
+            Effects->shake = false;
+    }
 
     if (Ball->Position.y >= this->Height) {
         this->ResetLevel();
@@ -121,6 +141,8 @@ void Game::ProcessInput(float dt) {
 
 void Game::Render() {
     if (this->State == GAME_ACTIVE) {
+        Effects->BeginRender();
+
         Renderer->DrawSprite(ResourceManager::GetTexture("background"), 
             glm::vec2(0, 0), glm::vec2(this->Width, this->Height), 0.0f
         );
@@ -128,6 +150,9 @@ void Game::Render() {
         Player->Draw(*Renderer);
         Particles->Draw();
         Ball->Draw(*Renderer);
+
+        Effects->EndRender();
+        Effects->Render((float)glfwGetTime());
     }
 }
 
@@ -199,8 +224,14 @@ void Game::DoCollisions() {
         if (!obj.Destroyed) {
             Collision res = CheckCollision(*Ball, obj);
             if (std::get<0>(res)) {
-                if (!obj.IsSolid)
+                if (!obj.IsSolid) {
                     obj.Destroyed = true;
+                }
+                else {
+                    // if block is solid, enable shake effect
+                    ShakeTime = 0.05f;
+                    Effects->shake = true;
+                }
 
                 Direction dir = std::get<1>(res);
                 glm::vec2 diff = std::get<2>(res);
