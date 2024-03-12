@@ -6,6 +6,7 @@
 #include <GLFW/glfw3.h>
 
 #include "level.h"
+#include "power_up.h"
 
 
 enum GameState {
@@ -32,6 +33,7 @@ public:
     unsigned int            Width, Height;
     std::vector<GameLevel>  Levels;
     unsigned int            Level;
+    std::vector<PowerUp>    PowerUps;
 
     Game(unsigned int width, unsigned int height);
     ~Game();
@@ -46,6 +48,9 @@ public:
     // reset
     void ResetLevel();
     void ResetPlayer();
+    // power up
+    void SpawnPowerUps(GameObject &block);
+    void UpdatePowerUps(GLfloat dt);
 };
 
 #endif
