@@ -1,6 +1,8 @@
 #include <glad/glad.h>
 #include "sprite_renderer.h"
 
+#define OPTIMIZE
+
 
 SpriteRenderer::SpriteRenderer(Shader &shader) {
     this->shader = shader;
@@ -14,6 +16,8 @@ SpriteRenderer::~SpriteRenderer() {
 
 void SpriteRenderer::initRenderData() {
     unsigned int VBO;
+
+#ifndef OPTIMIZE
     float vertices[] = { 
     //  position    texture
         0.0f, 1.0f, 0.0f, 1.0f,
@@ -24,6 +28,15 @@ void SpriteRenderer::initRenderData() {
         1.0f, 1.0f, 1.0f, 1.0f,
         1.0f, 0.0f, 1.0f, 0.0f
     };
+#else
+    float vertices[] = {
+    //  position    texture
+        0.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f, 1.0f,
+        1.0f, 0.0f, 1.0f, 0.0f,
+        1.0f, 1.0f, 1.0f, 1.0f,
+    };
+#endif
 
     glGenVertexArrays(1, &this->quadVAO);
     glGenBuffers(1, &VBO);
@@ -57,6 +70,12 @@ void SpriteRenderer::DrawSprite(Texture2D &texture, glm::vec2 position, glm::vec
     texture.Bind();
 
     glBindVertexArray(this->quadVAO);
+
+#ifndef OPTIMIZE
     glDrawArrays(GL_TRIANGLES, 0, 6);
+#else
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+#endif
+
     glBindVertexArray(0);
 }

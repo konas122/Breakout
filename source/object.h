@@ -11,7 +11,7 @@ class GameObject {
 public:
     glm::vec2   Position, Size, Velocity;
     glm::vec3   Color;
-    float Rotation;
+    float       Rotation;
     bool        IsSolid;
     bool        Destroyed;
 

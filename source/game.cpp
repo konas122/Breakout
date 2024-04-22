@@ -10,11 +10,11 @@
 // #define CONFUSE_DEBUG
 
 
-BallObject      *Ball;
-GameObject      *Player;
-SpriteRenderer  *Renderer;
+BallObject          *Ball;
+GameObject          *Player;
+SpriteRenderer      *Renderer;
 ParticleGenerator   *Particles;
-PostProcessor   *Effects;
+PostProcessor       *Effects;
 
 const float PLAYER_VELOCITY(500.0f);
 const glm::vec2 PLAYER_SIZE(100.0f, 20.0f);
@@ -29,10 +29,7 @@ void ActivatePowerUp(PowerUp &powerUp);
 
 
 Game::Game(unsigned int width, unsigned int height) 
-    : State(GAME_ACTIVE), Keys(), Width(width), Height(height)
-{ 
-
-}
+    : State(GAME_ACTIVE), Keys(), Width(width), Height(height) {}
 
 
 Game::~Game() {
@@ -52,7 +49,8 @@ void Game::Init() {
 
     // configure shaders
     glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(this->Width), 
-        static_cast<float>(this->Height), 0.0f, -1.0f, 1.0f);
+                                      static_cast<float>(this->Height), 0.0f,
+                                      -1.0f, 1.0f);
 
     ResourceManager::GetShader("sprite").Use().SetInteger("sprite", 0);
     ResourceManager::GetShader("sprite").SetMatrix4("projection", projection);
@@ -232,7 +230,7 @@ Collision CheckCollision(BallObject &a, GameObject &b) {
 
 
 void Game::DoCollisions() {
-    // collision between Ball and Brisks
+    // Ball-Brisks collision
     for (auto &obj : this->Levels[this->Level].Bricks) {
         if (!obj.Destroyed) {
             Collision res = CheckCollision(*Ball, obj);
@@ -272,7 +270,7 @@ void Game::DoCollisions() {
         }
     }
 
-    // collision between Ball and Player
+    // Ball-Player collision
     Collision res = CheckCollision(*Ball, *Player);
     if (!Ball->Stuck && std::get<0>(res)) {
         float center = Player->Position.x + Player->Size.x / 2;

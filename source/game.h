@@ -22,13 +22,13 @@ enum Direction {
     LEFT
 };
 
-typedef std::tuple<bool, Direction, glm::vec2> Collision;
+using Collision = std::tuple<bool, Direction, glm::vec2>;
 
 
 class Game {
 public:
-    // game state
     GameState               State;	
+
     bool                    Keys[1024];
     unsigned int            Width, Height;
     std::vector<GameLevel>  Levels;
@@ -38,16 +38,18 @@ public:
     Game(unsigned int width, unsigned int height);
     ~Game();
 
-    // initialize game state (load all shaders/textures/levels)
     void Init();
+
     // game loop
     void ProcessInput(float dt);
     void Update(float dt);
     void Render();
     void DoCollisions();
+
     // reset
     void ResetLevel();
     void ResetPlayer();
+
     // power up
     void SpawnPowerUps(GameObject &block);
     void UpdatePowerUps(GLfloat dt);

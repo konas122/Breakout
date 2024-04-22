@@ -28,10 +28,10 @@ void GameLevel::Load(const char *file, unsigned int levelWidth, unsigned int lev
 
 
 void GameLevel::init(std::vector<std::vector<unsigned int>> tileData, unsigned int levelWidth, unsigned int levelHeight) {
-    // calculate dimensions
-    unsigned int height = tileData.size();
-    unsigned int width = tileData[0].size(); // note we can index vector at [0] since this function is only called if height > 0
-    float unit_width = levelWidth / static_cast<float>(width), unit_height = levelHeight / height; 
+    unsigned int height = (unsigned int)tileData.size();
+    unsigned int width = (unsigned int)tileData[0].size();
+    float unit_width = levelWidth / static_cast<float>(width);
+    float unit_height = levelHeight / static_cast<float>(height);
 
     for (unsigned int y = 0; y < height; ++y) {
         for (unsigned int x = 0; x < width; ++x) {
@@ -48,10 +48,9 @@ void GameLevel::init(std::vector<std::vector<unsigned int>> tileData, unsigned i
                 obj.IsSolid = true;
                 this->Bricks.push_back(obj);
             }
-            // non-solid; now determine its color based on level data
+            // non-solid
             else if (tileData[y][x] > 1) {
-                // original: white
-                glm::vec3 color = glm::vec3(1.0f);
+                glm::vec3 color = glm::vec3(1.0f);  // white
 
                 if (tileData[y][x] == 2)
                     color = glm::vec3(0.2f, 0.6f, 1.0f);

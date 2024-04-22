@@ -2,6 +2,8 @@
 
 #include "particle.h"
 
+#define OPTIMIZE
+
 
 ParticleGenerator::ParticleGenerator(Shader shader, Texture2D texture, unsigned int amount)
     : shader(shader), texture(texture), amount(amount) {
@@ -11,6 +13,8 @@ ParticleGenerator::ParticleGenerator(Shader shader, Texture2D texture, unsigned 
 
 void ParticleGenerator::init() {
     unsigned int VBO;
+
+#ifndef OPTIMIZE
     float particle_quad[] = {
         0.0f, 1.0f, 0.0f, 1.0f,
         1.0f, 0.0f, 1.0f, 0.0f,
@@ -20,6 +24,14 @@ void ParticleGenerator::init() {
         1.0f, 1.0f, 1.0f, 1.0f,
         1.0f, 0.0f, 1.0f, 0.0f
     };
+#else
+    float particle_quad[] = {
+        0.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f, 1.0f,
+        1.0f, 0.0f, 1.0f, 0.0f,
+        1.0f, 1.0f, 1.0f, 1.0f,
+    };
+#endif
 
     glGenVertexArrays(1, &this->VAO);
     glGenBuffers(1, &VBO);
@@ -32,7 +44,7 @@ void ParticleGenerator::init() {
     glBindVertexArray(0);
 
     for (unsigned int i = 0; i < this->amount; i++)
-        this->particles.push_back(Particle());
+        this->particles.emplace_back(Particle());
 }
 
 
@@ -71,7 +83,7 @@ unsigned int ParticleGenerator::firstUnusedParticle() {
             return i;
         }
     }
-    // all particles are taken, override the first one (note that if it repeatedly hits this case, more particles should be reserved)
+    // all particles are taken, override the first one
     lastUsedParticle = 0;
     return 0;
 }
@@ -98,7 +110,13 @@ void ParticleGenerator::Draw() {
             this->shader.SetVector4f("color", particle.Color);
             this->texture.Bind();
             glBindVertexArray(this->VAO);
+
+#ifndef OPTIMIZE
             glDrawArrays(GL_TRIANGLES, 0, 6);
+#else
+            glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+#endif
+
             glBindVertexArray(0);
         }
     }

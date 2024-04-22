@@ -3,6 +3,8 @@
 
 #include "post_process.h"
 
+#define OPTIMIZE
+
 
 PostProcessor::PostProcessor(Shader shader, unsigned int width, unsigned int height)
         : PostProcessor_Shader(shader), Texture(), Width(width), Height(height), confuse(false), chaos(false), shake(false) {
@@ -11,7 +13,7 @@ PostProcessor::PostProcessor(Shader shader, unsigned int width, unsigned int hei
     glGenFramebuffers(1, &this->FBO);
     glGenRenderbuffers(1, &this->RBO);
 
-    // initialize renderbuffer storage with a multisampled color buffer (don't need a depth/stencil buffer)
+    // initialize renderbuffer storage with a multisampled color buffer
     glBindFramebuffer(GL_FRAMEBUFFER, this->MSFBO);
     glBindRenderbuffer(GL_RENDERBUFFER, this->RBO);
     // allocate storage for render buffer object
@@ -42,7 +44,7 @@ PostProcessor::PostProcessor(Shader shader, unsigned int width, unsigned int hei
         {  offset,  offset  },  // top-right
         { -offset,  0.0f    },  // center-left
         {  0.0f,    0.0f    },  // center-center
-        {  offset,  0.0f    },  // center - right
+        {  offset,  0.0f    },  // center-right
         { -offset, -offset  },  // bottom-left
         {  0.0f,   -offset  },  // bottom-center
         {  offset, -offset  }   // bottom-right    
@@ -65,6 +67,8 @@ PostProcessor::PostProcessor(Shader shader, unsigned int width, unsigned int hei
 
 void PostProcessor::initRenderData() {
     unsigned int VBO;
+
+#ifndef OPTIMIZE
     float vertices[] = {
         // pos        // tex
         -1.0f, -1.0f, 0.0f, 0.0f,
@@ -75,6 +79,15 @@ void PostProcessor::initRenderData() {
          1.0f, -1.0f, 1.0f, 0.0f,
          1.0f,  1.0f, 1.0f, 1.0f
     };
+#else
+    float vertices[] = {
+        // Pos        // Tex
+        -1.0f,  1.0f, 0.0f, 1.0f,
+        -1.0f, -1.0f, 0.0f, 0.0f,
+         1.0f,  1.0f, 1.0f, 1.0f,
+         1.0f, -1.0f, 1.0f, 0.0f,
+    };
+#endif
 
     glGenVertexArrays(1, &this->VAO);
     glGenBuffers(1, &VBO);
@@ -118,6 +131,12 @@ void PostProcessor::Render(float time) {
     glActiveTexture(GL_TEXTURE0);
     this->Texture.Bind();	
     glBindVertexArray(this->VAO);
+
+#ifndef OPTIMIZE
     glDrawArrays(GL_TRIANGLES, 0, 6);
+#else
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+#endif
+
     glBindVertexArray(0);
 }
