@@ -20,6 +20,7 @@ const float PLAYER_VELOCITY(500.0f);
 const glm::vec2 PLAYER_SIZE(100.0f, 20.0f);
 
 const float BALL_RADIUS = 20.0f;
+const unsigned int kParticleAmount = 800;
 const glm::vec2 INITIAL_BALL_VELOCITY(100.0f, -350.0f);
 
 float strength = 2.0f;
@@ -73,7 +74,7 @@ void Game::Init() {
 
     // set render-specific controls
     Renderer = new SpriteRenderer(ResourceManager::GetShader("sprite"));
-    Particles = new ParticleGenerator(ResourceManager::GetShader("particle"), ResourceManager::GetTexture("particle"), 1000);
+    Particles = new ParticleGenerator(ResourceManager::GetShader("particle"), ResourceManager::GetTexture("particle"), kParticleAmount);
     Effects = new PostProcessor(ResourceManager::GetShader("postprocessing"), this->Width, this->Height);
 
 #ifdef CHAOS_DEBBUG

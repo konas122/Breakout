@@ -24,6 +24,8 @@ public:
 class ParticleGenerator {
 public:
     ParticleGenerator(Shader shader, Texture2D texture, unsigned int amount);
+    ~ParticleGenerator();
+
     void Update(float dt, GameObject &object, unsigned int newParticles, glm::vec2 offset = glm::vec2(0.0f, 0.0f));
     void Draw();
 
@@ -34,6 +36,9 @@ private:
     Shader shader;
     Texture2D texture;
     unsigned int VAO;
+
+    float* instance_data;
+    unsigned int instance_vbo;
 
     void init();
     unsigned int firstUnusedParticle();
